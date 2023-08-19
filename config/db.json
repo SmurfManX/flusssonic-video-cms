@@ -1,0 +1,26 @@
+[
+    {
+        "logo": "/static/thumbnails/download.jpeg",
+        "file_name": "Ruby Gillman, Teenage Kraken",
+        "file_path": "2023-08-19\\RUBYGILLMAN.mp4",
+        "upload_time": "2023-08-19",
+        "file_size": 170.5100460052,
+        "hls_url": "https://cdn.example.com/2023-08-19/RUBYGILLMAN.mp4/index.m3u8"
+    },
+    {
+        "logo": "/static/thumbnails/MV5BMTJhYjI1N2ItM2E4MC00ZmYzLTk2YzYtNTE5YTM1MDU0NjRiXkEyXkFqcGdeQXVyMTMxNjYyMTgw._V1_.jpg",
+        "file_name": "Heart of Stone",
+        "file_path": "2023-08-19\\HEART_OF_STONE.mp4",
+        "upload_time": "2023-08-19",
+        "file_size": 176.1159467697,
+        "hls_url": "https://cdn.example.com/2023-08-19/HEART_OF_STONE.mp4/index.m3u8"
+    },
+    {
+        "logo": "/static/thumbnails/220px-TheAvengers2012Poster.jpg",
+        "file_name": "The Avengers",
+        "file_path": "2023-08-19\\Avengers.mp4",
+        "upload_time": "2023-08-19",
+        "file_size": 142.0265102386,
+        "hls_url": "https://cdn.example.com/2023-08-19/Avengers.mp4/index.m3u8"
+    }
+]

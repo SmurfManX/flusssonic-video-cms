@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video CMS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        /* Custom CSS for button and icon styling */
+        .btn-small {
+            font-size: 0.8rem;
+            padding: 0 8px;
+        }
+        .btn-icon {
+            font-size: 1.2rem;
+            padding: 4px;
+            margin-left: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Video CMS</h1>
+        <form action="/" method="post" enctype="multipart/form-data">
+            <div class="input-field">
+                <input type="text" id="file_name" name="file_name" required>
+                <label for="file_name">File Name</label>
+            </div>
+            <div class="file-field input-field">
+                <div class="btn">
+                    <span>Logo</span>
+                    <input type="file" name="logo" accept=".png, .jpeg, .jpg" required>
+                </div>
+                <div class="file-path-wrapper">
+                    <input class="file-path validate" type="text" placeholder="Choose Logo">
+                </div>
+            </div>
+            <div class="file-field input-field">
+                <div class="btn">
+                    <span>Video</span>
+                    <input type="file" name="video_file" accept=".mp4" required>
+                </div>
+                <div class="file-path-wrapper">
+                    <input class="file-path validate" type="text" placeholder="Choose Video File">
+                </div>
+            </div>
+            <button type="submit" class="btn waves-effect waves-light"><i class="material-icons left">cloud_upload</i>Upload</button>
+        </form>
+        <h2>VOD</h2>
+        <table class="striped">
+            <thead>
+                <tr>
+                    <th>Logo</th>
+                    <th>
+                        <a href="{{ url_for('index', sort='file_name', order='asc' if sort_column == 'file_name' and sort_order != 'asc' else 'desc') }}">
+                            File Name
+                            <i class="material-icons">
+                                {{ 'keyboard_arrow_' + ('up' if sort_column == 'file_name' and sort_order == 'asc' else 'down') }}
+                            </i>
+                        </a>
+                    </th>
+                    <th>
+                        <a href="{{ url_for('index', sort='upload_time', order='asc' if sort_column == 'upload_time' and sort_order != 'asc' else 'desc') }}">
+                            Upload Date
+                            <i class="material-icons">
+                                {{ 'keyboard_arrow_' + ('up' if sort_column == 'upload_time' and sort_order == 'asc' else 'down') }}
+                            </i>
+                        </a>
+                    </th>
+                    <th>
+                        <a href="{{ url_for('index', sort='file_size', order='asc' if sort_column == 'file_size' and sort_order != 'asc' else 'desc') }}">
+                            File Size (MB)
+                            <i class="material-icons">
+                                {{ 'keyboard_arrow_' + ('up' if sort_column == 'file_size' and sort_order == 'asc' else 'down') }}
+                            </i>
+                        </a>
+                    </th>
+                    <th>HLS URL</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for video in videos %}
+                <tr>
+                <td><img src="{{ video.logo }}" alt="Logo" style="width: 60px; height: 80px;"></td>
+                <td>{{ video.file_name }}</td>
+                <td>{{ video.upload_time }}</td>
+                <td>{{ video.file_size }} MB</td>
+                <td>
+                    <div class="copy-hls-container">
+                        <a href="{{ video.hls_url }}" class="copy-hls-url" data-hls="{{ video.hls_url }}">{{ video.hls_url }}</a>
+                        <span class="copy-hls-icon material-icons"></span>
+                    </div>
+                </td>
+                <td>
+                        <!-- Dropdown Trigger -->
+                        <a class='dropdown-trigger btn' href='#' data-target='dropdown{{ loop.index0 }}'>
+                            <i class="material-icons">more_vert</i>
+                        </a>
+                        <!-- Dropdown Structure -->
+                        <ul id='dropdown{{ loop.index0 }}' class='dropdown-content'>
+                            <li>
+                                <form action="{{ url_for('delete_video', video_id=loop.index0) }}" method="post">
+                                    <button type="submit" class="btn-flat"><i class="material-icons">delete</i>Delete</button>
+                                </form>
+                            </li>
+                            <li><a href="#rename-modal{{ loop.index0 }}" class="modal-trigger"><i class="material-icons">edit</i>Rename</a></li>
+                        </ul>
+
+                        <!-- Rename Modal Structure -->
+                        <div id="rename-modal{{ loop.index0 }}" class="modal">
+                            <div class="modal-content">
+                                <h4>Rename Video</h4>
+                                <form action="{{ url_for('rename_video', video_id=loop.index0) }}" method="post">
+                                    <div class="input-field">
+                                        <input type="text" id="new_name{{ loop.index0 }}" name="new_name" required>
+                                        <label for="new_name{{ loop.index0 }}">New Name</label>
+                                    </div>
+                                    <button type="submit" class="btn waves-effect waves-light">Rename</button>
+                                </form>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var dropdownElems = document.querySelectorAll('.dropdown-trigger');
+    var dropdownInstances = M.Dropdown.init(dropdownElems, { coverTrigger: false });
+
+    var modalElems = document.querySelectorAll('.modal');
+    var modalInstances = M.Modal.init(modalElems);
+
+    var copyButtons = document.querySelectorAll('.copy-hls-url');
+    copyButtons.forEach(function(button) {
+        button.addEventListener('click', function(event) {
+            event.preventDefault(); // Prevent the link from navigating
+
+            var hlsUrl = button.getAttribute('data-hls');
+            copyTextToClipboard(hlsUrl);
+        });
+    });
+});
+
+function copyTextToClipboard(text) {
+    var dummyTextArea = document.createElement('textarea');
+    document.body.appendChild(dummyTextArea);
+    dummyTextArea.value = text;
+    dummyTextArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(dummyTextArea);
+    M.toast({html: 'HLS URL copied to clipboard', classes: 'rounded'});
+}
+</script>
+
+
+</body>
+</html>
